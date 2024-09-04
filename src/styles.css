@@ -1,0 +1,94 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.container {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas: 
+        "sidebar display";
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: rgb(6, 90, 175);
+    overflow: auto;
+    padding: 10px 20px;
+    & p {
+        font-size: 30px;
+        color: white;
+    }
+
+    & .icon {
+        width: 30px;
+    }
+
+    & .projects,
+      .notes {
+        display: flex;
+        justify-content: space-between;
+        & :hover {
+            color: rgb(175, 198, 211);
+            text-decoration: underline;
+            cursor: grab;
+            width: 35px;
+            transition: 0.3s;
+        }
+        max-height: 50%;
+        overflow: auto;
+        margin-bottom: 0;
+    }
+}
+
+.projects-list,
+.notes-list {
+    overflow: auto;
+    margin-left: 30px;
+    & p {
+        font-size: 20px;
+    }
+    & p:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    max-height: 30%;
+    margin-top: 0px;
+    display: hidden;
+}
+
+.display {
+    grid-area: display;
+    background-color: rgb(172, 216, 255);
+    overflow: auto;
+    padding: 40px;
+    display: flex;
+}
+
+.add-new-note-button {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 30px;
+    color: white;
+    background-color: rgb(6, 90, 175);
+}
+
+.text-area {
+    width: 60%;
+    height: 20%;
+    background-color: rgb(207, 228, 235);
+}
+
+article {
+    margin: 10px;
+    background-color: rgb(3, 76, 140);
+    padding: 20px;
+    color: rgb(214, 229, 236);
+    font-size: 1.2rem;
+    border-radius: 5px;
+    text-align: center;
+    border: 5px solid #607791
+}
