@@ -1,5 +1,4 @@
-import { format } from '../node_modules/date-fns'
-import editIcon from './img/edit.svg'
+import { format, parseISO } from '../node_modules/date-fns'
 import deleteIcon from './img/delete.svg'
 
 // Declarations
@@ -8,34 +7,41 @@ let projectsSidebarHeader = document.querySelector('.projects > p');
 let projectsTray = document.querySelector('.projects-list')
 const projects = JSON.parse( localStorage.getItem('projects') );
 renderTodos(projects[0]);
-let newTodoButton = document.querySelector('#addTodo');
 let cancelButton = document.querySelector('#cancel');
-
+const addProjectIcon = document.querySelector('.add-project');
 const dialog = document.querySelector('.new-todo');
+const projectDialog = document.querySelector('.new-project');
 const form = document.querySelector('#todo-info');
+const projectForm = document.querySelector('#project-info');
+let cancelProject = document.querySelector('#cancel-project');
 
 // Visualizing Projects Data Strucutre
 // localStorage = {
-// ____projects: [
-//     ____{
-//         ____name: 'nameOfProject',
-//         ____todos: [
-//             ____{
-//                 ____dateNow,
-//                 ____details,
-//                 ____dueDate,
-//                 ____priority,
-//                 ____title,
-//             ____}
-//         ____]
-//     ____}
-// ____]
+//     projects: [
+//         {
+//             name: 'nameOfProject',
+//             todos: [
+//                 {
+//                     dateNow,
+//                     details,
+//                     dueDate,
+//                     priority,
+//                     title,
+//                 }
+//             ],
+//             id: ,
+//         }
+//     ]
 // }
+
+// TODOS: make enter also submit, make new empty project have delete button and more obvious add todo
+// Add delete icon to projectsTray with functionality
 
 // Creating classes for Project and Todos
 class Project {
     constructor(name) {
         this.name = name;
+        this.todos = [];
     }
 }
 class Todo {
@@ -43,25 +49,54 @@ class Todo {
         this.title = title;
         this.details = details;
         this.dateNow = format(new Date, 'MMMM do');
-        this.dueDate = format(dueDate, 'MMMM do');
+        this.dueDate = dueDate;
         this.priority = priority;
     };
 };
 
-// Configuring form behavior for adding a new todo to a project
-form.addEventListener('submit', (e) => {
+// Adding new project
+function newProjectButton() {
+    projectDialog.showModal();
+    projectForm.onsubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(projectForm);
+        const formDataObject = Object.fromEntries(formData);
+        let name = formDataObject.name;
+        let project = new Project(name);
+        projects.push(project);
+        giveIdsByIndex(projects);
+        localStorage.setItem('projects', JSON.stringify(projects))
+        projectForm.reset();
+        projectDialog.close();
+        renderTodos(projects[projects.length - 1]);
+        listProjects();
+    }
+}
+
+cancelProject.addEventListener('click', (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
-    const formDataObject = Object.fromEntries(formData);
-    let { title, details, date, priority } = formDataObject;
-    let todo = new Todo(title, details, date, priority);
-    form.reset();
-    dialog.close();
+    projectForm.reset();
+    projectDialog.close();
 })
 
-newTodoButton.addEventListener('click', () => {
-    dialog.showModal();
-})
+// Configuring form behavior for adding a new todo to a project
+function newTodoButtonPress(index) {
+        dialog.showModal();
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const formDataObject = Object.fromEntries(formData);
+            let { title, details, dueDate, priority } = formDataObject;
+            let dueDateISO = parseISO(dueDate);
+            let dueDateFormatted = format(dueDateISO, 'MMMM do')
+            let todo = new Todo(title, details, dueDateFormatted, priority);
+            projects[index].todos.unshift(todo);
+            localStorage.setItem('projects', JSON.stringify(projects))
+            renderTodos(projects[index])
+            form.reset();
+            dialog.close();
+        }
+}
 
 cancelButton.addEventListener('click', (e) => {
     e.preventDefault();
@@ -71,11 +106,14 @@ cancelButton.addEventListener('click', (e) => {
 
 // Making Project Names show up in the projects tray
 function listProjects() {
+    while (projectsTray.firstChild) {
+        projectsTray.removeChild(projectsTray.firstChild);
+    } 
     projects.forEach((project, index) => {
         let newProject = document.createElement('p');
         newProject.textContent = project.name;
         newProject.setAttribute('id', index);
-        newProject.addEventListener('click', renderTodos.bind(this, project));
+        newProject.addEventListener('click', () => {renderTodos(project)});
         projectsTray.appendChild(newProject);
     })
 }
@@ -84,6 +122,10 @@ function listProjects() {
 function emptyDisplay() {
     display.textContent = '';
     display.innerHTML = '';
+    display.style.display = '';
+    display.style.flexDirection = '';
+    display.style.alignItems = '';
+    display.style.justifyContent = '';
 }
 
 function configureTodosContainer() {
@@ -94,20 +136,25 @@ function configureTodosContainer() {
     display.style.alignItems = '';
 }
 
-function constructHeader(projectName) {
+function constructHeader(projectObject) {
     let headerContainer = document.createElement('div');
     headerContainer.classList.add('header-container');
         let header = document.createElement('h1');
-        header.textContent = projectName
+        header.textContent = projectObject.name;
         let addTodoButton = document.createElement('button');
-        addTodoButton.setAttribute('id', 'addTodo');
         addTodoButton.textContent = 'Add New Todo'
+        addTodoButton.addEventListener('click', () => {newTodoButtonPress(projectObject.id)})
     headerContainer.appendChild(header);
     headerContainer.appendChild(addTodoButton);
     display.appendChild(headerContainer);
 }
 
-function constructTodos(todoTitle, todoDetails, todoDateMade, todoDueDate, todoPriority) {
+function constructTodos(todoTitle, todoDetails, todoDateMade, todoDueDate, todoPriority, index, projectIndex) {
+    let detailsContainer = document.createElement('div');
+    detailsContainer.classList.add('hidden', 'details-container');
+    detailsContainer.id = index;
+    detailsContainer.textContent = todoDetails;
+    
     let todoContainer = document.createElement('div');
     todoContainer.classList.add('todo-container');
         let leftAligned = document.createElement('div');
@@ -130,6 +177,9 @@ function constructTodos(todoTitle, todoDetails, todoDateMade, todoDueDate, todoP
         rightAligned.classList.add('right-aligned');
             let detailsButton = document.createElement('button');
             detailsButton.textContent = 'Details';
+            detailsButton.addEventListener('click', () => {
+                showDetails(detailsContainer, index);
+            })
         rightAligned.appendChild(detailsButton);
             let dateMade = document.createElement('div');
             dateMade.classList.add('date-made');
@@ -149,13 +199,10 @@ function constructTodos(todoTitle, todoDetails, todoDateMade, todoDueDate, todoP
             dueDate.appendChild(dueDatePara1);
             dueDate.appendChild(dueDatePara2);
         rightAligned.appendChild(dueDate);
-            let edit = document.createElement('img');
-            edit.src = editIcon;
-            edit.alt = 'Edit';
-        rightAligned.appendChild(edit);
             let deletes = document.createElement('img');
             deletes.src = deleteIcon;
             deletes.alt = 'Delete';
+            deletes.addEventListener('click', () => {deleteTodo(projects, index, projectIndex)})
         rightAligned.appendChild(deletes);
     
     todoContainer.appendChild(rightAligned);
@@ -172,19 +219,77 @@ function constructTodos(todoTitle, todoDetails, todoDateMade, todoDueDate, todoP
     }
 
     display.appendChild(todoContainer);
+    display.appendChild(detailsContainer);
+}
+
+function giveIdsByIndex(array) {
+    array.forEach((item, index) => {
+        item.id = index;
+    })
 }
 
 function renderTodos(projectObject) {
-    configureTodosContainer();
-    constructHeader(projectObject.name);
-    projectObject.todos.forEach((todo) => {
-        let { title, details, dateNow, dueDate, priority } = todo;
-        constructTodos(title, details, dateNow, dueDate, priority);
-    })
+    if (projects.length !== 0) {
+        let projectIndex = projectObject.id;
+        configureTodosContainer();
+        constructHeader(projectObject);
+        projectObject.todos.forEach((todo, index) => {
+            let { title, details, dateNow, dueDate, priority, } = todo;
+            constructTodos(title, details, dateNow, dueDate, priority, index, projectIndex);
+        })
+    } else {
+        hasEmptyProject();
+    }
+}
+
+function deleteTodo(projectObject, index, indexOfProject) {
+    let currentProject = projectObject[indexOfProject];
+    currentProject.todos.splice(index, 1);
+    if (currentProject.todos.length === 0) {
+        projects.splice(indexOfProject, 1);
+        indexOfProject = 0;
+    }
+    giveIdsByIndex(projects);
+    localStorage.setItem('projects', JSON.stringify(projects))
+    
+    if (projects.length !== 0) {
+    renderTodos(projectObject[indexOfProject])
+    } else {
+        hasEmptyProject();
+    }
+    
+    listProjects();
+}
+
+function hasEmptyProject() {
+    emptyDisplay()
+    display.style.display = 'flex';
+    display.style.flexDirection = 'column';
+    display.style.alignItems = 'center';
+    display.style.justifyContent = 'center';
+    let notice = document.createElement('h1')
+    notice.textContent = 'There are no projects!!!'
+    display.appendChild(notice);
+    let addProjectAtZeroButton = document.createElement('button');
+    addProjectAtZeroButton.textContent = 'Add New Project +';
+    addProjectAtZeroButton.classList.add('add-new-project-button');
+    addProjectAtZeroButton.addEventListener('click', newProjectButton);
+    display.appendChild(addProjectAtZeroButton);
 }
 
 listProjects()
 
+// Showing Details
+function showDetails(element) {
+    element.classList.toggle('hidden');
+}
+
 projectsSidebarHeader.addEventListener('click', () => {
-    projectsTray.classList.toggle('hidden');
+    if (display.style.justifyContent === 'center') {
+        renderTodos(projects[0]);
+    } else {
+        projectsTray.classList.toggle('hidden');
+    }
 })
+
+addProjectIcon.addEventListener('click', newProjectButton)

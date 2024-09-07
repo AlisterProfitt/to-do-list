@@ -7,7 +7,7 @@ import './styles.css';
         todos: [
             {
                 title: 'Learn Webpack (example)', 
-                details: 'Research how to merge webpack.common.js and the pr…tion and development mode versions of those files', 
+                details: 'Research how to merge webpack.common.js and the production and development mode versions of those files', 
                 dateNow: 'September 4th', 
                 dueDate: 'September 5th', 
                 priority: 'medium'
@@ -24,7 +24,8 @@ import './styles.css';
                 dueDate: 'October 15th', 
                 priority: 'high'
             },
-        ]
+        ],
+        id: 0,
     };
 
     const weightLoss = {
@@ -37,7 +38,8 @@ import './styles.css';
                 dueDate: 'October 30th', 
                 priority: 'high'
             },
-        ]
+        ],
+        id: 1,
     };
 
     const getJob = {
@@ -56,7 +58,8 @@ import './styles.css';
                 dueDate: 'September 25th', 
                 priority: 'low'
             },
-        ]
+        ],
+        id: 2,
     };
 
     const shoppingList = {
@@ -69,7 +72,8 @@ import './styles.css';
                 dueDate: 'September 5th', 
                 priority: 'high'
             },
-        ]
+        ],
+        id: 3,
     }
 
     const projects = [study, weightLoss, getJob, shoppingList];

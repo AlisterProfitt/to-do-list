@@ -12,7 +12,7 @@
         <div class="sidebar">
             <div class="projects">
                 <p>Projects</p>
-                <img class="icon" src="./img/plus.svg" alt="Add">
+                <img class="add-project icon" src="./img/plus.svg" alt="Add">
             </div>
 
             <div class="projects-list">
@@ -42,8 +42,8 @@
                         <input type="text-area" required id="details" name="details">
                     </div>
                     <div>
-                        <label for="date">Due Date</label>
-                        <input type="date" required id="date" name="date">
+                        <label for="dueDate">Due Date</label>
+                        <input type="date" required id="dueDate" name="dueDate">
                     </div>
                     <div>
                         <fieldset>
@@ -63,33 +63,24 @@
                 </div>
             </form>
         </dialog>
+        
+        <dialog class="new-project">
+            <form action="" id="project-info">
+                <div>
+                    <div>
+                        <label for="name">Enter Project Name</label>
+                        <input type="text" required id="name" name="name">
+                    </div>
+                </div>
+                <div>
+                    <button value="cancel" formmethod="dialog" id="cancel-project">Cancel</button>
+                    <button id="confirm-project" type="submit">Confirm</button>
+                </div>
+            </form>
+        </dialog>
 
 
         <div class="display">
-            <!-- <div class="header-container">
-                <h1>Project Title</h1>
-                <button id="addTodo">Add New Todo</button>
-            </div>
-            <div class="todo-container">
-                <div class="left-aligned">
-                    <input type="checkbox" name="project-checkbox" class="project-checkbox">
-                    <p>Title</p>
-                </div>
-                
-                <div class="right-aligned">
-                    <button>Details</button>
-                    <div class="date-made">
-                        <p>Date Made</p>
-                        <p>September 4th</p>
-                    </div>
-                    <div class="due-date">
-                        <p>Due Date</p>
-                        <p>October 16th</p>
-                    </div>
-                    <img src="./img/edit.svg" alt="Edit">
-                    <img src="./img/delete.svg" alt="Delete">
-                </div>
-            </div> -->
         </div>
 
 

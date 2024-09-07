@@ -83,7 +83,6 @@ function renderNotes(array) {
             localStorage.setItem('notes', JSON.stringify(array));
             renderNotes(array);
             checkNoNotesInArray()
-            console.log(notesArray);
         }
         let noteCard = document.createElement('article');
         noteCard.textContent = note;
